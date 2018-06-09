@@ -47,6 +47,7 @@ Events:
     * Argument 1: WS message.
  * messages: Event for access to a raw message burst.
     * Argument 1: Message list.
+ * auth: Event for successful authentication.
 
 #### client.model
 
