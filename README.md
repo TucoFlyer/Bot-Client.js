@@ -12,7 +12,7 @@ npm install TucoFlyer/Bot-Client.js
 ```js
 var BotClient = require('Bot-Client.js');
 
-var client = new BotClient("ws://127.0.0.1:8080", "key"); // Create a BotClient instance with the WS URL, and the auth key.
+var client = new BotClient("./connection.txt"); // Create a BotClient instance with the path of connection.txt.
 
 // Add an event listener for authentication ready
 client.events.addListener("auth", function() {
@@ -25,6 +25,13 @@ client.events.addListener("auth", function() {
 ```
 
 ## Documentation
+
+### new BotClient(path)
+
+Creates a new BotClient, and attempts to connect.
+
+Parameters:
+ * path - Path of connection.txt.
 
 ### new BotClient(url, key)
 
