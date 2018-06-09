@@ -46,7 +46,7 @@ Events:
 
 #### client.model
 
-BotModel of the client. See BotClient.BotModel for more info.
+BotModel of the client. See [BotModel](#botmodel) for more info.
 
 #### client.authenticated
 
