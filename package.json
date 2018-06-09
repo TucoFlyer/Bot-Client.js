@@ -1,6 +1,7 @@
 {
   "name": "bot-client.js",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "private": true,
   "description": "JavaScript client for commanding and monitoring the Bot-Controller via WebSockets",
   "main": "index.js",
   "scripts": {
