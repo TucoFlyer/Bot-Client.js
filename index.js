@@ -4,13 +4,17 @@ var Base64 = require('crypto-js/enc-base64');
 var ReconnectingWebSocket = require('reconnecting-websocket');
 
 class BotModel {
+    /**
+     * Creates a new BotModel instance.
+     * @constructor
+     */
     constructor() {
-        this.flyer = {};
-        this.winches = [];
-        this.gimbal_values = [];
-        this.gimbal_status = {};
-        this.camera = {};
-        this.camera.outputs = {};
+        this.flyer = {}; // Flyer sensor data. (updated by FlyerSensors messages)
+        this.winches = []; // Winch status. (updated by WinchStatus messages)
+        this.gimbal_values = []; // Gimbal data. (updated by GimbalValue messages)
+        this.gimbal_status = {}; // Gimbal status. (updated by GimbalControlStatus)
+        this.camera = {}; // Camera data. (updated by Command.CameraObjectDetection, and Command.CameraRegionTracking)
+        this.camera.outputs = {}; // Camera output status. (updated by Command.CameraOutputStatus)
     }
 
     update(msg) {
@@ -46,20 +50,32 @@ class BotModel {
     }
 }
 
-class BotClient {
+module.exports = class BotClient {
+    /**
+     * Creates a new BotClient instance.
+     * @constructor
+     * @param {String} url The WebSocket URL of Bot-Controller.
+     * @param {String} key The authentication key.
+     */
     constructor(url, key) {
+
+        // Message types to subscribe to.
         this.message_subscription = [
             "ConfigIsCurrent", "Command", "FlyerSensors", "WinchStatus",
             "GimbalControlStatus", "GimbalValue", "UnhandledGimbalPacket",
         ];
 
+        // Event emitter setup
         this.events = new EventEmitter();
         this.events.setMaxListeners(100);
-        this.socket = null;
-        this.frame_request = null;
-        this.model = new BotModel();
-        this.auth_challenge = null;
-        this.key = key;
+
+        this.socket = null; // Variable for ReconnectingWebSocket
+        this.frame_request = null; // HTML Frame update request. (only used in Browserify)
+        this.model = new BotModel(); // BotModel of client.
+        this.auth_challenge = null; // Authentication challange from WS.
+        this.key = key; // Authentication key.
+
+        // Status variables
         this.authenticated = false;
         this.connected = false;
 
@@ -70,7 +86,7 @@ class BotClient {
         this.send = this.send.bind(this);
         this.authenticate = this.authenticate.bind(this);
 
-        // Connect
+        // Connect to WebSocket server.
         this.socket = new ReconnectingWebSocket(url, undefined, { WebSocket: require('ws') });
         this.socket.addEventListener('message', this.handleSocketMessage);
         this.socket.addEventListener('open', this.handleSocketOpen);
@@ -143,7 +159,7 @@ class BotClient {
     }
 
     handleSocketOpen() {
-        this.send({Subscription: this.message_subscription});
+        this.send({Subscription: this.message_subscription}); // Subscribe to specified message types.
         this.authenticated = false;
         this.connected = true;
     }
@@ -153,10 +169,18 @@ class BotClient {
         this.connected = false;
     }
 
-    send(json) {
-        this.socket.send(JSON.stringify(json));
+    /**
+     * Send a message.
+     * @param {Object} obj 
+     */
+    send(obj) {
+        this.socket.send(JSON.stringify(obj));
     }
 
+    /**
+     * Authenticate.
+     * Do not call. The message handler calls this when needed.
+     */
     authenticate() {
         const challenge = this.auth_challenge;
         const key = this.key;
@@ -166,6 +190,9 @@ class BotClient {
         }
     }
 
+    /**
+     * Closes the connection.
+     */
     destroy() {
         if (this.socket) {
             this.socket.removeEventListener('message', this.handleSocketMessage);
@@ -179,8 +206,3 @@ class BotClient {
         }
     }
 }
-
-module.exports = {
-    BotModel,
-    BotClient
-};
