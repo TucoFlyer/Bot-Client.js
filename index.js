@@ -151,6 +151,7 @@ module.exports = class BotClient {
             // True or false, set logged-in state
             this.events.emit('log', json);
             this.authenticated = json.AuthStatus === true;
+            if (this.authenticated) this.events.emit('auth');
 
         } else {
             this.events.emit('log', json);
