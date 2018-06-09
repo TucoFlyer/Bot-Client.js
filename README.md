@@ -1,8 +1,6 @@
 # Bot-Client.js
 JavaScript client for commanding and monitoring the Bot-Controller via WebSockets.
 
-*NOTE: Bot-Client.js is heavily under development. Currently, it only supports handling messages from the server, and authentication. Movement commands can not be sent.*
-
 ## Install
 
 ```
@@ -14,17 +12,21 @@ npm install TucoFlyer/Bot-Client.js
 ```js
 var BotClient = require('Bot-Client.js');
 
-var client = new BotClient.BotClient("ws://127.0.0.1:8080", "key"); // Create a BotClient instance with the WS URL, and the auth key.
+var client = new BotClient("ws://127.0.0.1:8080", "key"); // Create a BotClient instance with the WS URL, and the auth key.
 
-// Add an event listener
-client.events.addListener("gimbal", function(data) {
-    console.log(data);
+// Add an event listener for authentication ready
+client.events.addListener("auth", function() {
+    this.context.botConnection.send({ Command: { SetMode: "ManualFlyer" }}); // Set manual control mode
+    this.context.botConnection.send({ Command: { ManualControlValue: [ "RelativeX", 0.5 ] }}); // Start moving in X direction
+    setTimeout(function() { // 1s later
+        this.context.botConnection.send({ Command: { ManualControlValue: [ "RelativeX", 0 ] }}); // Stop moving in X direction
+    }, 1000);
 });
 ```
 
 ## Documentation
 
-### new BotClient.BotClient(url, key)
+### new BotClient(url, key)
 
 Creates a new BotClient, and attempts to connect.
 
@@ -48,7 +50,7 @@ Events:
 
 #### client.model
 
-BotModel of the client. See BotClient.BotModel for more info.
+BotModel of the client. See [BotModel](#botmodel) for more info.
 
 #### client.authenticated
 
@@ -58,7 +60,7 @@ Boolean, whether the client is authenticated or not.
 
 Boolean, whether the client is connected or not.
 
-### BotClient.BotModel
+### BotModel
 
 Bot data model. Used in `client.model`.
 
