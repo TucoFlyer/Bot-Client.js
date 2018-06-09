@@ -2,6 +2,9 @@ var EventEmitter = require('events').EventEmitter;
 var hmacSHA512 = require('crypto-js/hmac-sha512');
 var Base64 = require('crypto-js/enc-base64');
 var ReconnectingWebSocket = require('reconnecting-websocket');
+var fs = require('fs');
+var request = require('request');
+var deasync = require('deasync');
 
 class BotModel {
     /**
@@ -54,8 +57,8 @@ module.exports = class BotClient {
     /**
      * Creates a new BotClient instance.
      * @constructor
-     * @param {String} url The WebSocket URL of Bot-Controller.
-     * @param {String} key The authentication key.
+     * @param {String} url The WebSocket URL of Bot-Controller, or the path of connection.txt.
+     * @param {String} key The authentication key. (Not needed if connection.txt's path was provided.)
      */
     constructor(url, key) {
 
@@ -73,7 +76,31 @@ module.exports = class BotClient {
         this.frame_request = null; // HTML Frame update request. (only used in Browserify)
         this.model = new BotModel(); // BotModel of client.
         this.auth_challenge = null; // Authentication challange from WS.
+        this.url = url;
         this.key = key; // Authentication key.
+        this.txtPath = null;
+        
+        if (key == null || key == undefined) { // If connection.txt path was pssed.
+            this.txtPath = url;
+            
+            var connectionTxt = fs.readFileSync(this.txtPath, "UTF-8");
+            
+            // Get and parse URL.
+            var connectionUrl = connectionTxt.split("\n")[0];
+            var parsedUrl = new URL(connectionUrl);
+            
+            var wsStatusURL = `${parsedUrl.protocol}//${parsedUrl.hostname}/ws`; // Construct websocket status URL.
+            
+            var done = false;
+            
+            request(wsStatusUrl, function(err, res, body) { // Get websocket URL
+                done = true;
+                if (err) throw err;
+                this.url = body;
+            }.bind(this));
+            
+            deasync.loopWhile(() => !done); // Loop until request is finished
+        }
 
         // Status variables
         this.authenticated = false;
@@ -87,7 +114,7 @@ module.exports = class BotClient {
         this.authenticate = this.authenticate.bind(this);
 
         // Connect to WebSocket server.
-        this.socket = new ReconnectingWebSocket(url, undefined, { WebSocket: require('ws') });
+        this.socket = new ReconnectingWebSocket(this.url, undefined, { WebSocket: require('ws') });
         this.socket.addEventListener('message', this.handleSocketMessage);
         this.socket.addEventListener('open', this.handleSocketOpen);
         this.socket.addEventListener('close', this.handleSocketClose);
@@ -160,6 +187,15 @@ module.exports = class BotClient {
     }
 
     handleSocketOpen() {
+        if (this.txtPath) { // if connection.txt was specified
+            var connectionTxt = fs.readFileSync(this.txtPath, "UTF-8"); // read connection.txt
+            
+            var connectionUrl = connectionTxt.split("\n")[0]; // get URL
+            var parsedUrl = new URL(connectionUrl); // parse URL
+            
+            this.key = parsedUrl.searchParams.get("key"); // get key from query parameter
+        }
+        
         this.send({Subscription: this.message_subscription}); // Subscribe to specified message types.
         this.authenticated = false;
         this.connected = true;
