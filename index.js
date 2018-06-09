@@ -5,7 +5,7 @@ var ReconnectingWebSocket = require('reconnecting-websocket');
 var fs = require('fs');
 var request = require('request');
 var deasync = require('deasync');
-var URL = require('url');
+var URL = require('url').URL;
 
 class BotModel {
     /**
@@ -88,7 +88,7 @@ module.exports = class BotClient {
             
             // Get and parse URL.
             var connectionUrl = connectionTxt.split("\n")[0];
-            var parsedUrl = URL.parse(connectionUrl);
+            var parsedUrl = new URL(connectionUrl);
             
             var wsStatusURL = `${parsedUrl.protocol}//${parsedUrl.hostname}/ws`; // Construct websocket status URL.
             
@@ -192,7 +192,7 @@ module.exports = class BotClient {
             var connectionTxt = fs.readFileSync(this.txtPath, "UTF-8"); // read connection.txt
             
             var connectionUrl = connectionTxt.split("\n")[0]; // get URL
-            var parsedUrl = URL.parse(connectionUrl); // parse URL
+            var parsedUrl = new URL(connectionUrl); // parse URL
             
             this.key = parsedUrl.searchParams.get("key"); // get key from query parameter
         }
