@@ -64,6 +64,8 @@ Boolean, whether the client is connected or not.
 
 Bot data model. Used in `client.model`.
 
+For more info about values, see [message.rs](https://github.com/TucoFlyer/Bot-Controller/blob/master/src/message.rs).
+
 #### model.flyer
 
 Flyer Sensor data. (FlyerSensors)
