@@ -20,6 +20,8 @@
   "dependencies": {
     "crypto-js": "^3.1.9-1",
     "reconnecting-websocket": "^4.0.0-rc5",
-    "ws": "^5.2.0"
+    "ws": "^5.2.0",
+    "request": "^2.87.0",
+    "deasync": "^0.1.13"
   }
 }
