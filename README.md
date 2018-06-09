@@ -1,8 +1,6 @@
 # Bot-Client.js
 JavaScript client for commanding and monitoring the Bot-Controller via WebSockets.
 
-*NOTE: Bot-Client.js is heavily under development. Currently, it only supports handling messages from the server, and authentication. Movement commands can not be sent.*
-
 ## Install
 
 ```
