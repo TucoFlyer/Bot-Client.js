@@ -194,7 +194,7 @@ module.exports = class BotClient {
             var connectionUrl = connectionTxt.split("\n")[0]; // get URL
             var parsedUrl = new URL(connectionUrl); // parse URL
             
-            this.key = parsedUrl.searchParams.get("key"); // get key from query parameter
+            this.key = parsedUrl.searchParams.get("k"); // get key from query parameter
         }
         
         this.send({Subscription: this.message_subscription}); // Subscribe to specified message types.
