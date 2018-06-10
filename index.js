@@ -90,7 +90,7 @@ module.exports = class BotClient {
             var connectionUrl = connectionTxt.split("\n")[0];
             var parsedUrl = new URL(connectionUrl);
             
-            var wsStatusURL = `${parsedUrl.protocol}//${parsedUrl.hostname}/ws`; // Construct websocket status URL.
+            var wsStatusURL = `${parsedUrl.protocol}//${parsedUrl.host}/ws`; // Construct websocket status URL.
             
             var done = false;
             
