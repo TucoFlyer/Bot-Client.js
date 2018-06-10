@@ -209,10 +209,16 @@ module.exports = class BotClient {
 
     /**
      * Send a message.
-     * @param {Object} obj 
+     * @param {Object} obj
+     * @returns {Promise}
      */
     send(obj) {
-        this.socket.send(JSON.stringify(obj));
+        return new Promise((resolve, reject) => {
+            this.socket.send(JSON.stringify(obj), {}, function(err) {
+                if (err != null && err != undefined && err instanceof Error) reject(err);
+                else resolve();
+            });
+        });
     }
 
     /**
