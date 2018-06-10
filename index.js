@@ -156,7 +156,7 @@ module.exports = class BotClient {
 
             // Batch messages into UI frames
             if (!this.frame_request) {
-                if (window) {
+                if (process.browser) {
                     this.frame_request = window.requestAnimationFrame(() => {
                         this.frame_request = null;
                         this.events.emit('frame', this.model);
