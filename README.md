@@ -16,10 +16,10 @@ var client = new BotClient("./connection.txt"); // Create a BotClient instance w
 
 // Add an event listener for authentication ready
 client.events.addListener("auth", function() {
-    this.context.botConnection.send({ Command: { SetMode: "ManualFlyer" }}).then(function() { // Set manual control mode
-        this.context.botConnection.send({ Command: { ManualControlValue: [ "RelativeX", 0.5 ] }}).then(function() { // Start moving in X direction
+    client.send({ Command: { SetMode: "ManualFlyer" }}).then(function() { // Set manual control mode
+        client.send({ Command: { ManualControlValue: [ "RelativeX", 0.5 ] }}).then(function() { // Start moving in X direction
             setTimeout(function() { // 1s later
-                this.context.botConnection.send({ Command: { ManualControlValue: [ "RelativeX", 0 ] }}); // Stop moving in X direction
+                client.send({ Command: { ManualControlValue: [ "RelativeX", 0 ] }}); // Stop moving in X direction
             }, 1000);
         });
     });
