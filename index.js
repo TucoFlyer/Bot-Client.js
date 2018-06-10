@@ -193,8 +193,8 @@ module.exports = class BotClient {
             
             var connectionUrl = connectionTxt.split("\n")[0]; // get URL
             var parsedUrl = new URL(connectionUrl); // parse URL
-            
-            this.key = parsedUrl.searchParams.get("k"); // get key from query parameter
+
+            this.key = /#\?k=(.+)/i.exec(parsedUrl.href)[1]; // get key from query parameter
         }
         
         this.send({Subscription: this.message_subscription}); // Subscribe to specified message types.
@@ -214,7 +214,7 @@ module.exports = class BotClient {
      */
     send(obj) {
         return new Promise((resolve, reject) => {
-            this.socket.send(JSON.stringify(obj), {}, function(err) {
+            this.socket._ws.send(JSON.stringify(obj), {}, function(err) {;
                 if (err != null && err != undefined && err instanceof Error) reject(err);
                 else resolve();
             });
