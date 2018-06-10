@@ -19,7 +19,9 @@ client.events.addListener("auth", function() {
     client.send({ Command: { SetMode: "ManualFlyer" }}).then(function() { // Set manual control mode
         client.send({ Command: { ManualControlValue: [ "RelativeX", 0.5 ] }}).then(function() { // Start moving in X direction
             setTimeout(function() { // 1s later
-                client.send({ Command: { ManualControlValue: [ "RelativeX", 0 ] }}); // Stop moving in X direction
+                client.send({ Command: { ManualControlValue: [ "RelativeX", 0 ] }}).then(function() { // Stop moving in X direction
+                    client.destroy(); // Close the connection
+                });
             }, 1000);
         });
     });
